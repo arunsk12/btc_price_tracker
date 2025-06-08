@@ -1,0 +1,23 @@
+# Use a slim Python image for smaller size
+FROM python:3.9-slim-buster
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy requirements file and install dependencies
+COPY ingestion/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the ingestion script
+COPY ingestion/main.py .
+
+# Copy the .env file (it will be at the root of the build context)
+# It's copied to /app so load_dotenv() can find it.
+COPY .env .
+
+# Set a healthcheck (optional, but good for Docker Compose to know if service is ready)
+# This checks if CoinGecko's simple ping endpoint is reachable
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 CMD [ "python", "-c", "import requests; requests.get('https://api.coingecko.com/api/v3/ping').raise_for_status()" ]
+
+# Default command to run the ingestion script (will be overridden by cron in docker-compose)
+CMD ["python", "main.py"]

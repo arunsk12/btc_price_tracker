@@ -1,0 +1,60 @@
+services:
+  ingestion:
+    build:
+      context: .             # Build context is the current directory (btc_price_tracker)
+      dockerfile: Dockerfile.ingestion # Use the specific Dockerfile for ingestion
+    volumes:
+      # Mount the ingestion folder and .env file into the container
+      - ./ingestion:/app/ingestion
+      - ./.env:/app/.env
+    environment:
+      # Pass environment variables from the host's .env to the container
+      # Docker Compose automatically loads these from .env if present in the same directory.
+      - SNOWFLAKE_ACCOUNT
+      - SNOWFLAKE_USER
+      - SNOWFLAKE_PASSWORD
+      - SNOWFLAKE_ROLE
+      - SNOWFLAKE_WAREHOUSE
+      - SNOWFLAKE_DATABASE
+      - SNOWFLAKE_SCHEMA_RAW
+    # Override the default CMD to run the ingestion script on an hourly loop
+    command: >
+      /bin/sh -c "
+        echo 'Starting BTC price ingestion service...'
+        while true; do
+          echo '--- Running BTC price ingestion script ---'
+          python /app/ingestion/main.py
+          echo '--- BTC price ingestion complete. Waiting for 1 hour... ---'
+          sleep 60 # Sleep for 1 minute (60 seconds)
+        done
+      "
+    # Optional: Add restart policy for resilience
+    restart: unless-stopped
+
+  dbt:
+    build:
+      context: .             # Build context is the current directory (btc_price_tracker)
+      dockerfile: Dockerfile.dbt # Use the specific Dockerfile for dbt
+    volumes:
+      # Mount the dbt_project folder and .env into the container
+      - ./dbt_project:/usr/app/dbt_project
+      - ./.env:/usr/app/dbt_project/.env # Mount .env inside dbt_project for profile access
+    environment:
+      # Pass environment variables from the host's .env to the dbt container
+      - SNOWFLAKE_ACCOUNT
+      - SNOWFLAKE_USER
+      - SNOWFLAKE_PASSWORD
+      - SNOWFLAKE_ROLE
+      - SNOWFLAKE_WAREHOUSE
+      - SNOWFLAKE_DATABASE
+      - SNOWFLAKE_SCHEMA_ANALYTICS
+    # dbt service doesn't need to run continuously, it's for manual execution via docker exec.
+    # `depends_on` ensures ingestion starts first, though for manual dbt runs it's not strictly critical for this setup.
+    depends_on:
+      - ingestion
+    # Ensure dbt container stays running so you can exec into it
+    # entrypoint is already /bin/bash from Dockerfile.dbt
+    #command: ["tail", "-f", "/dev/null"] # Keep the container alive indefinitely
+    command: ["sleep", "infinity"] # This command will keep the container running indefinitely
+    
+    restart: unless-stopped

@@ -1,0 +1,23 @@
+FROM python:3.9-slim-buster
+
+WORKDIR /usr/app
+
+# Install dbt-snowflake and other necessary packages
+# Pin to a compatible version (check dbt docs for latest compatible)
+RUN pip install --no-cache-dir dbt-snowflake~=1.8.0
+
+# Copy dbt project and profiles (from build context root)
+COPY dbt_project /usr/app/dbt_project/
+
+COPY dbt_project/models/staging/schema.yml /usr/app/dbt_project/models/staging
+
+COPY dbt_project/tests/ /usr/app/dbt_project/tests/
+
+# Copy the .env file for dbt to pick up environment variables
+COPY .env /usr/app/dbt_project/
+
+# Set default working directory for dbt commands
+WORKDIR /usr/app/dbt_project
+
+# Set entrypoint to bash to allow running dbt commands interactively
+# ENTRYPOINT ["/bin/bash"]
