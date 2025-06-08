@@ -1,6 +1,6 @@
-Username: ARUNSK12
-Dedicated Login URL: https://dvnwqnt-tx56682.snowflakecomputing.com
-
+Goal : 
+Ingest hourly Bitcoin (BTC) price data from the CoinGecko API into Snowflake, then use dbt to transform the raw JSON into a structured table for analysis. 
+Orchestrate this process using Docker and a simple cron-like scheduler.
 
 
 mkdir.exe btc_price_tracker
