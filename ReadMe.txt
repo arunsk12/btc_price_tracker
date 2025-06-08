@@ -70,7 +70,24 @@ CREATE TABLE IF NOT EXISTS COINGECKO_RAW_BTC_PRICE (
 
 ============================
 
-
+docker-compose down --volumes --rmi all
 
 docker-compose build
+
+docker-compose up -d --build
+
+docker ps --filter "name=btc_price_tracker-dbt" --format "{{.Names}}"
+
+docker exec -it btc_price_tracker-dbt-1 bash
+
+--docker-compose down
+docker-compose up -d --build dbt ingestion
+
+dbt run 
+
+dbt debug 
+
+dbt test
+
+
 
