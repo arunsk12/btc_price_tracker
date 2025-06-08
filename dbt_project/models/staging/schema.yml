@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: BTC_ANALYTICS # This 'name' is the first argument in {{ source('btc_analytics', '...') }}
+    database: BTC_ANALYTICS # The actual database name in Snowflake
+    schema: RAW # The actual schema name in Snowflake where the raw table resides
+
+    tables:
+      - name: COINGECKO_RAW_BTC_PRICE # This 'name' is the second argument in {{ source('...', 'coingecko_raw_btc_price') }}
+        description: "Raw JSON responses from CoinGecko API for BTC price"
+        columns:
+          - name: API_RESPONSE
+            description: "Full JSON response from CoinGecko API."
+            data_type: VARIANT # Optional, but good for docs
+          - name: INGESTION_TIMESTAMP
+            description: "Timestamp when the data was ingested into Snowflake."
+            data_type: TIMESTAMP_LTZ # Optional, but good for docs
+            tests:
+              - not_null # Example: ensure this column is never null

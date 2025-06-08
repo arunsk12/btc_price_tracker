@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: dim_btc_price
+    description: "Bitcoin price history and market data from CoinGecko"
+    columns:
+      - name: timestamp_utc
+        description: "Timestamp of the BTC price data (UTC, sourced from CoinGecko API's last_updated_at)."
+        tests:
+          - unique # Ensures no duplicate timestamps for price entries
+          - not_null # Ensures timestamp is always present
+          - dbt_utils.expression_is_true: # Custom test using dbt_utils package
+              expression: "timestamp_utc <= CURRENT_TIMESTAMP()" # Ensures timestamp is not in the future
+              config:
+                error_if: "true"
+
+      - name: price_usd
+        description: "Bitcoin price in USD."
+        tests:
+          - not_null # Ensures price is always present
+          - dbt_utils.expression_is_true:
+              expression: "price_usd > 0" # Ensures price is a positive value
+              config:
+                error_if: "true"

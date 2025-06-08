@@ -1,0 +1,15 @@
+btc_price_tracker: # This is the profile name, referenced in dbt_project.yml
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      # Using environment variables for credentials (loaded by Docker/Compose)
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA_ANALYTICS') }}" # Default schema for dbt models if not overridden
+      threads: 4
+      client_session_keep_alive: False

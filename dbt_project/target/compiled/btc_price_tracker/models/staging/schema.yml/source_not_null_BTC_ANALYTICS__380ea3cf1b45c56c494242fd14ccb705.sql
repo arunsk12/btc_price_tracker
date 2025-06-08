@@ -1,0 +1,11 @@
+
+    
+    
+
+
+
+select INGESTION_TIMESTAMP
+from BTC_ANALYTICS.RAW.COINGECKO_RAW_BTC_PRICE
+where INGESTION_TIMESTAMP is null
+
+

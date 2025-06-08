@@ -1,0 +1,14 @@
+
+    
+    
+
+select
+    timestamp_utc as unique_field,
+    count(*) as n_records
+
+from BTC_ANALYTICS.ANALYTICS_analytics.dim_btc_price
+where timestamp_utc is not null
+group by timestamp_utc
+having count(*) > 1
+
+

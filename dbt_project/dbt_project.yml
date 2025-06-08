@@ -1,0 +1,26 @@
+name: 'btc_price_tracker'
+version: '1.0.0'
+config-version: 2
+
+profile: 'btc_price_tracker' # This name must match the profile in profiles.yml
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  btc_price_tracker: # This is the name of your dbt project (from 'name' above)
+    marts:
+      +materialized: table
+      +schema: analytics # This schema will be used for tables in models/marts
+    staging:
+      +materialized: view
+      +schema: raw # This schema will be used for views in models/staging
